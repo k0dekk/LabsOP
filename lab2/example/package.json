@@ -1,9 +1,0 @@
-{
-  "name": "generators-lib-example",
-  "version": "1.0.0",
-  "description": "Usage examples for generators-lib",
-  "main": "index.js",
-  "dependencies": {
-    "generators-lib": "file:../lib"
-  }
-}

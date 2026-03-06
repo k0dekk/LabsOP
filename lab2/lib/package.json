@@ -1,0 +1,9 @@
+{
+  "name": "generators-lib",
+  "version": "1.0.0",
+  "description": "Library of generators and timeout iterator utilities",
+  "main": "src/index.js",
+  "author": "Student",
+  "license": "MIT",
+  "keywords": ["generators", "iterators", "fibonacci", "timeout"]
+}

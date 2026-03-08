@@ -1,0 +1,8 @@
+{
+  "name": "lab3-generators-memo",
+  "version": "1.0.0",
+  "description": "Lab 3: Generators + Memoization",
+  "private": true,
+  "author": "Student",
+  "license": "MIT"
+}

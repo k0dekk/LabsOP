@@ -1,16 +1,10 @@
-/**
- * Lab 3 Example: Generators + Memoization
- * Run: npm install && node index.js
- */
-
 const { fibonacciGenerator, runWithTimeout, memoize } = require("generators-lib");
 
 console.log("0.01 sec Fibonacci\n");
 runWithTimeout(fibonacciGenerator(), 0.01);
 
-console.log("\n=== Memoization ===\n");
+console.log("\nMemoization\n");
 
-// Heavy computation for demo (recursive calls use memoized version)
 const memoizedFib = memoize(function fib(n) {
   if (n <= 1) return n;
   return memoizedFib(n - 1) + memoizedFib(n - 2);
@@ -27,7 +21,7 @@ console.timeEnd("cached fib(35)");
 
 console.log(`fib(35) = ${a}, cached = ${b}, same: ${a === b}\n`);
 
-// LFU demo
+// LFU
 function expensive(x) {
   return x * 2;
 }

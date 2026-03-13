@@ -1,7 +1,7 @@
 {
   "name": "generators-lib-example",
   "version": "1.0.0",
-  "description": "Usage examples: generators + memoization",
+  "description": "generators + memoization",
   "main": "index.js",
   "dependencies": {
     "generators-lib": "file:../lib"

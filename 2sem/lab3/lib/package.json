@@ -1,8 +1,8 @@
 {
   "name": "generators-lib",
   "version": "2.0.0",
-  "description": "Library: generators, timeout iterator, memoization",
+  "description": "generators, timeout iterator, memoization",
   "main": "src/index.js",
-  "author": "K0dekk",
+  "author": "kodek",
   "license": "MIT"
 }

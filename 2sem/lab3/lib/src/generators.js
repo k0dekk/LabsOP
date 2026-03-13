@@ -1,8 +1,3 @@
-/**
- * Generator functions for infinite sequences
- */
-
-/** Fibonacci Sequence Generator */
 function* fibonacciGenerator() {
   let [a, b] = [0, 1];
   while (true) {

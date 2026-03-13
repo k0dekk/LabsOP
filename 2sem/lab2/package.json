@@ -1,8 +1,8 @@
 {
   "name": "lab2-generators-project",
   "version": "1.0.0",
-  "description": "Lab 2: Project with generators library and example",
+  "description": "Lab 2",
   "private": true,
-  "author": "Student",
+  "author": "kodek",
   "license": "MIT"
 }

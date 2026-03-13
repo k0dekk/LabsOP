@@ -1,4 +1,4 @@
-# Lab 3 – Memoization
+# Memoization
 
 Implementation of a memoization function that caches results of pure functions to avoid repeated calculations.
 
@@ -10,6 +10,7 @@ Implementation of a memoization function that caches results of pure functions t
 
 ## Run
 
+```bash
 git clone <repo_url>
 cd example
 npm install

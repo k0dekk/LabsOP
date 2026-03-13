@@ -1,19 +1,9 @@
-/**
- * Memoization function with configurable eviction strategies
- */
-
-/**
- * Creates a cache key from function arguments
- */
 function createKey(args) {
   return JSON.stringify(args);
 }
 
-/**
- * Eviction strategies
- */
 const EVICTION = {
-  /** Least Recently Used */
+  // LRU
   LRU: (cache, maxSize) => {
     const entries = [...cache.entries()];
     if (entries.length <= maxSize) return;
@@ -24,7 +14,7 @@ const EVICTION = {
     }
   },
 
-  /** Least Frequently Used */
+  // LFU
   LFU: (cache, maxSize) => {
     const entries = [...cache.entries()];
     if (entries.length <= maxSize) return;
@@ -35,7 +25,6 @@ const EVICTION = {
     }
   },
 
-  /** Time-Based - entries older than maxAgeMs are removed */
   TIME_BASED: (cache, _, maxAgeMs) => {
     const now = Date.now();
     for (const [key, entry] of cache.entries()) {
@@ -46,16 +35,6 @@ const EVICTION = {
   },
 };
 
-/**
- * Memoizes a pure function with configurable cache and eviction
- *
- * @param {Function} fn - Pure function to memoize
- * @param {Object} [options]
- * @param {number} [options.maxSize] - Max cache entries (default: unlimited)
- * @param {'LRU'|'LFU'|'TIME_BASED'|Function} [options.eviction] - Eviction strategy
- * @param {number} [options.maxAgeMs] - For TIME_BASED: expire after ms
- * @returns {Function} Memoized function
- */
 function memoize(fn, options = {}) {
   const { maxSize, eviction = "LRU", maxAgeMs = 60000 } = options;
 

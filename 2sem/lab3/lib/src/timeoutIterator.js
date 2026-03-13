@@ -1,7 +1,3 @@
-/**
- * Timeout Iterator - consumes an iterator for a limited time
- */
-
 function runWithTimeout(iterable, timeoutSeconds, processor) {
   const iterator = iterable[Symbol.iterator] ? iterable[Symbol.iterator]() : iterable;
   const endTime = Date.now() + timeoutSeconds * 1000;

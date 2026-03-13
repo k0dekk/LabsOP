@@ -3,6 +3,6 @@
   "version": "2.0.0",
   "description": "Library: generators, timeout iterator, memoization",
   "main": "src/index.js",
-  "author": "Student",
+  "author": "K0dekk",
   "license": "MIT"
 }

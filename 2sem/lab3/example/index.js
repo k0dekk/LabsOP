@@ -5,8 +5,8 @@
 
 const { fibonacciGenerator, runWithTimeout, memoize } = require("generators-lib");
 
-console.log("=== Fibonacci (0.5 sec) ===\n");
-runWithTimeout(fibonacciGenerator(), 0.5);
+console.log("0.01 sec Fibonacci\n");
+runWithTimeout(fibonacciGenerator(), 0.01);
 
 console.log("\n=== Memoization ===\n");
 

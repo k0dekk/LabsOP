@@ -1,6 +1,16 @@
-# Lab 3: Generators + Memoization
+# Lab 3 – Memoization
 
-Еволюція Lab 2 з memoization та виводом кешу.
+Implementation of a memoization function that caches results of pure functions to avoid repeated calculations.
 
-- `cd example && npm install && node index.js` — Node
-- Відкрити `index.html` у браузері — веб-демо з виводом кешу, eviction, hits/misses
+## Features
+- configurable cache size
+- LRU and LFU eviction strategies
+- time-based expiration
+- custom eviction policy
+
+## Run
+
+git clone <repo_url>
+cd example
+npm install
+node index.js

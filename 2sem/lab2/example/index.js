@@ -1,9 +1,4 @@
-/**
- * Usage examples for generators-lib
- * Run: npm install && node index.js
- */
-
 const { fibonacciGenerator, runWithTimeout } = require("generators-lib");
 
-console.log("=== Fibonacci Generator (0.5 sec) ===");
-runWithTimeout(fibonacciGenerator(), 0.5);
+console.log("0.01 Fibonacci Generator");
+runWithTimeout(fibonacciGenerator(), 0.01);

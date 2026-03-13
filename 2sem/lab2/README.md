@@ -1,14 +1,16 @@
-# Lab 2: Project Setup
+# Lab 2 – Project Setup
 
-Структура проєкту з бібліотекою та прикладом використання.
+This lab reorganizes the code from Lab 1 into a small library and an example project.
 
-- `cd example && npm install && node index.js` — Node
-- Відкрити `index.html` у браузері — веб-демо (ідентичне Lab 1)
+## Features
 
-## Git
+- Fibonacci generator
+- Iterator with timeout
 
-```bash
-git init
-git add .
-git commit -m "Initial commit: generators lib + example"
-```
+## Run
+
+Clone the repository and run the example project:
+git clone <repo_url>
+cd example
+npm install
+node index.js

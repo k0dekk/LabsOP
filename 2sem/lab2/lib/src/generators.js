@@ -1,8 +1,4 @@
-/**
- * Generator functions for infinite sequences
- */
-
-/** Fibonacci Sequence Generator */
+'use strict'
 function* fibonacciGenerator() {
   let [a, b] = [0, 1];
   while (true) {
@@ -11,6 +7,4 @@ function* fibonacciGenerator() {
   }
 }
 
-module.exports = {
-  fibonacciGenerator,
-};
+module.exports = { fibonacciGenerator };

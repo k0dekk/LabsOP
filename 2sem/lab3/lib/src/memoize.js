@@ -1,14 +1,18 @@
+// Creates a unique key from function arguments
 function createKey(args) {
   return JSON.stringify(args);
 }
 
+// Built-in eviction strategies
 const EVICTION = {
   // LRU
   LRU: (cache, maxSize) => {
     const entries = [...cache.entries()];
     if (entries.length <= maxSize) return;
+
     entries.sort((a, b) => a[1].lastAccess - b[1].lastAccess);
     const toRemove = entries.length - maxSize;
+
     for (let i = 0; i < toRemove; i++) {
       cache.delete(entries[i][0]);
     }
@@ -18,15 +22,19 @@ const EVICTION = {
   LFU: (cache, maxSize) => {
     const entries = [...cache.entries()];
     if (entries.length <= maxSize) return;
+
     entries.sort((a, b) => a[1].accessCount - b[1].accessCount);
     const toRemove = entries.length - maxSize;
+
     for (let i = 0; i < toRemove; i++) {
       cache.delete(entries[i][0]);
     }
   },
 
+  // Remove entries older than maxAgeMs
   TIME_BASED: (cache, _, maxAgeMs) => {
     const now = Date.now();
+
     for (const [key, entry] of cache.entries()) {
       if (now - entry.timestamp > maxAgeMs) {
         cache.delete(key);
@@ -35,13 +43,20 @@ const EVICTION = {
   },
 };
 
+// Memoization wrapper for pure functions
 function memoize(fn, options = {}) {
-  const { maxSize, eviction = "LRU", maxAgeMs = 60000 } = options;
+  const {
+    maxSize = Infinity,
+    eviction = "LRU",
+    maxAgeMs = 60000
+  } = options;
 
   const cache = new Map();
 
   const getEvictionFn = () => {
+    // allow custom eviction strategy
     if (typeof eviction === "function") return eviction;
+
     return EVICTION[eviction] || EVICTION.LRU;
   };
 
@@ -52,7 +67,13 @@ function memoize(fn, options = {}) {
 
     if (cache.has(key)) {
       const entry = cache.get(key);
-      const isExpired = eviction === "TIME_BASED" && maxAgeMs && Date.now() - entry.timestamp > maxAgeMs;
+
+      // check expiration for time-based strategy
+      const isExpired =
+        eviction === "TIME_BASED" &&
+        maxAgeMs &&
+        Date.now() - entry.timestamp > maxAgeMs;
+
       if (isExpired) {
         cache.delete(key);
       } else {
@@ -62,6 +83,7 @@ function memoize(fn, options = {}) {
       }
     }
 
+    // compute new value
     const value = fn.apply(this, args);
 
     cache.set(key, {
@@ -71,9 +93,10 @@ function memoize(fn, options = {}) {
       accessCount: 1,
     });
 
+    // run eviction
     if (eviction === "TIME_BASED") {
       EVICTION.TIME_BASED(cache, null, maxAgeMs);
-    } else if (maxSize !== undefined && maxSize !== null) {
+    } else if (maxSize !== Infinity) {
       evict(cache, maxSize);
     }
 

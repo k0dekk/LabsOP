@@ -1,66 +1,61 @@
-// Creates a unique key from function arguments
-function createKey(args) {
-  return JSON.stringify(args);
+let _objId = 0;
+const _objRegistry = new WeakMap();
+
+function getObjId(obj) {
+  if (!_objRegistry.has(obj)) _objRegistry.set(obj, ++_objId);
+  return `@ref:${_objRegistry.get(obj)}`;
 }
 
-// Built-in eviction strategies
+function serializeArg(arg) {
+  if (arg === undefined) return '__undefined__';
+  if (arg === null) return '__null__';
+  if (typeof arg === 'symbol') return `__symbol__:${arg.toString()}`;
+  if (typeof arg === 'function') return getObjId(arg);
+  if (typeof arg === 'object') {
+    try { return JSON.stringify(arg); } catch { return getObjId(arg); }
+  }
+  return String(arg);
+}
+
+function createKey(args) {
+  return args.map(serializeArg).join('|__|');
+}
+
 const EVICTION = {
-  // LRU
   LRU: (cache, maxSize) => {
-    const entries = [...cache.entries()];
-    if (entries.length <= maxSize) return;
-
-    entries.sort((a, b) => a[1].lastAccess - b[1].lastAccess);
-    const toRemove = entries.length - maxSize;
-
-    for (let i = 0; i < toRemove; i++) {
-      cache.delete(entries[i][0]);
+    while (cache.size >= maxSize) {
+      cache.delete(cache.keys().next().value);
     }
   },
 
-  // LFU
   LFU: (cache, maxSize) => {
-    const entries = [...cache.entries()];
-    if (entries.length <= maxSize) return;
-
-    entries.sort((a, b) => a[1].accessCount - b[1].accessCount);
-    const toRemove = entries.length - maxSize;
-
-    for (let i = 0; i < toRemove; i++) {
-      cache.delete(entries[i][0]);
+    while (cache.size >= maxSize) {
+      let minCount = Infinity;
+      let minKey = null;
+      for (const [k, v] of cache) {
+        if (v.accessCount < minCount) {
+          minCount = v.accessCount;
+          minKey = k;
+        }
+      }
+      if (minKey !== null) cache.delete(minKey);
     }
   },
 
-  // Remove entries older than maxAgeMs
-  TIME_BASED: (cache, _, maxAgeMs) => {
+  TIME_BASED: (cache, _maxSize, maxAgeMs) => {
     const now = Date.now();
-
-    for (const [key, entry] of cache.entries()) {
-      if (now - entry.timestamp > maxAgeMs) {
-        cache.delete(key);
-      }
+    for (const [key, entry] of cache) {
+      if (now - entry.timestamp > maxAgeMs) cache.delete(key);
     }
   },
 };
 
-// Memoization wrapper for pure functions
 function memoize(fn, options = {}) {
-  const {
-    maxSize = Infinity,
-    eviction = "LRU",
-    maxAgeMs = 60000
-  } = options;
+  const { maxSize = Infinity, eviction = 'LRU', maxAgeMs = 60000 } = options;
 
   const cache = new Map();
-
-  const getEvictionFn = () => {
-    // allow custom eviction strategy
-    if (typeof eviction === "function") return eviction;
-
-    return EVICTION[eviction] || EVICTION.LRU;
-  };
-
-  const evict = getEvictionFn();
+  const evictFn = typeof eviction === 'function' ? eviction : (EVICTION[eviction] || EVICTION.LRU);
+  const isTimeBased = eviction === 'TIME_BASED';
 
   return function memoized(...args) {
     const key = createKey(args);
@@ -68,22 +63,23 @@ function memoize(fn, options = {}) {
     if (cache.has(key)) {
       const entry = cache.get(key);
 
-      // check expiration for time-based strategy
-      const isExpired =
-        eviction === "TIME_BASED" &&
-        maxAgeMs &&
-        Date.now() - entry.timestamp > maxAgeMs;
-
-      if (isExpired) {
+      if (isTimeBased && Date.now() - entry.timestamp > maxAgeMs) {
         cache.delete(key);
       } else {
+        cache.delete(key);
+        cache.set(key, entry);
         entry.lastAccess = Date.now();
         entry.accessCount++;
         return entry.value;
       }
     }
 
-    // compute new value
+    if (isTimeBased) {
+      EVICTION.TIME_BASED(cache, null, maxAgeMs);
+    } else if (maxSize !== Infinity) {
+      evictFn(cache, maxSize);
+    }
+
     const value = fn.apply(this, args);
 
     cache.set(key, {
@@ -92,13 +88,6 @@ function memoize(fn, options = {}) {
       lastAccess: Date.now(),
       accessCount: 1,
     });
-
-    // run eviction
-    if (eviction === "TIME_BASED") {
-      EVICTION.TIME_BASED(cache, null, maxAgeMs);
-    } else if (maxSize !== Infinity) {
-      evict(cache, maxSize);
-    }
 
     return value;
   };

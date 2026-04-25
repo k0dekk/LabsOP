@@ -10,17 +10,19 @@ const randomDelay = () => {
 
 export function checkFieldAvailability(field) {
   return new Promise((resolve) => {
-    setTimeout(() => {
+    const delay = randomDelay();
+    
+    setTimeout(() => {      
       let isTaken = false;
-      
+
       if (field.type === 'username') {
         isTaken = takenUsernames.has(field.value);
       } else if (field.type === 'email') {
         isTaken = takenEmails.has(field.value);
       }
 
-      console.log(`firebase check -> ${field.type}: ${field.value} = ${isTaken}`);
+      console.log(`[db] check ${field.type}='${field.value}' | taken=${isTaken} (${delay}ms)`);
       resolve(isTaken);
-    }, randomDelay()); 
+    }, delay); 
   });
 }

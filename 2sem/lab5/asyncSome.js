@@ -18,3 +18,15 @@ export async function asyncSomePromise(arr, predicate) {
   }
   return false;
 }
+
+export async function asyncSomePromiseAbortable(arr, predicate, signal) {
+  for (let i = 0; i < arr.length; i++) {
+    if (signal?.aborted) {
+      throw new DOMException('Iteration aborted', 'AbortError');
+    }
+    
+    const res = await predicate(arr[i], i, arr, signal);
+    if (res) return true;
+  }
+  return false;
+}

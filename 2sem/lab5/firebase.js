@@ -1,5 +1,12 @@
-const takenUsernames = ['admin', 'user1', 'root', 'newUser42']; 
-const takenEmails = ['admin@example.com', 'test@test.com'];
+const takenUsernames = new Set(['admin', 'user1', 'root', 'sasha']);
+const takenEmails = new Set(['admin@example.com', 'test@test.com']);
+
+const MIN_DELAY = 300;
+const MAX_DELAY = 800;
+
+const randomDelay = () => {
+  return Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+};
 
 export function checkFieldAvailability(field) {
   return new Promise((resolve) => {
@@ -7,13 +14,13 @@ export function checkFieldAvailability(field) {
       let isTaken = false;
       
       if (field.type === 'username') {
-        isTaken = takenUsernames.includes(field.value);
+        isTaken = takenUsernames.has(field.value);
       } else if (field.type === 'email') {
-        isTaken = takenEmails.includes(field.value);
+        isTaken = takenEmails.has(field.value);
       }
 
       console.log(`firebase check -> ${field.type}: ${field.value} = ${isTaken}`);
       resolve(isTaken);
-    }, 500); 
+    }, randomDelay()); 
   });
 }

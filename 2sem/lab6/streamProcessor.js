@@ -38,4 +38,34 @@ async function computeDatasetStats(filePath) {
   return { totalRecords, uniqueNames: uniqueNames.size, perTeamSlot, perColor, topNamesByLength, longestName };
 }
 
-module.exports = { readTeamConfigs, computeDatasetStats };
+
+async function findConfigsForSlot(filePath, teamIndex, colorName, limit = 10) {
+  const results = [];
+
+  for await (const config of readTeamConfigs(filePath)) {
+    if (config.teamIndex === teamIndex && config.color.name === colorName) {
+      results.push(config);
+      if (results.length >= limit) break;
+    }
+  }
+
+  return results;
+}
+
+async function processInChunks(filePath, chunkSize, onChunk) {
+  let chunk      = [];
+  let chunkIndex = 0;
+
+  for await (const config of readTeamConfigs(filePath)) {
+    chunk.push(config);
+
+    if (chunk.length >= chunkSize) {
+      onChunk(chunk, chunkIndex++);
+      chunk = []; 
+    }
+  }
+
+  if (chunk.length > 0) onChunk(chunk, chunkIndex);
+}
+
+module.exports = { readTeamConfigs, computeDatasetStats, findConfigsForSlot, processInChunks };

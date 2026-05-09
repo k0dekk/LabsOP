@@ -25,20 +25,36 @@ function* allTeamConfigs() {
 }
 
 function generateTeamDataset(outputPath) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const writeStream = fs.createWriteStream(outputPath, { encoding: 'utf-8' });
-    let totalWritten = 0;
+    const generator   = allTeamConfigs();
+    let totalWritten  = 0;
 
-    for (const config of allTeamConfigs()) {
-      writeStream.write(JSON.stringify(config) + '\n');
-      totalWritten++;
-    }
-
-    writeStream.end();
+    writeStream.on('error', reject);
     writeStream.on('finish', () => {
       console.log(`Written ${totalWritten.toLocaleString()} records`);
       resolve();
     });
+
+    function writeNext() {
+      let canContinue = true;
+
+      while (canContinue) {
+        const { value, done } = generator.next();
+
+        if (done) {
+          writeStream.end();
+          return;
+        }
+
+        totalWritten++;
+        canContinue = writeStream.write(JSON.stringify(value) + '\n');
+      }
+
+      writeStream.once('drain', writeNext);
+    }
+
+    writeNext();
   });
 }
 

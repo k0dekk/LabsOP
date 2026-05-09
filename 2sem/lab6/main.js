@@ -16,6 +16,7 @@ const mb      = bytes => (bytes / 1_000_000).toFixed(2) + ' MB';
 const heapMB  = ()    => (process.memoryUsage().heapUsed / 1_000_000).toFixed(1) + ' MB';
 
 async function main() {
+  fs.mkdirSync(path.dirname(DATASET_PATH), { recursive: true });  
   console.log('Starting Lab 6...');
 
   console.log('Generating dataset...');

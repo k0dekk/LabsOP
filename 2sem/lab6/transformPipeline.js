@@ -8,12 +8,16 @@ class TeamConfigFilter extends Transform {
   constructor(predicate) {
     super(); 
     this.predicate  = predicate;
+    this._lineBuf   = '';
     this.kept       = 0;
     this.total      = 0;
   }
 
   _transform(chunk, _encoding, callback) {
-    const lines = chunk.toString('utf-8').split('\n');
+    this._lineBuf += chunk.toString('utf-8');
+
+    const lines    = this._lineBuf.split('\n');
+    this._lineBuf  = lines.pop();
 
     for (const line of lines) {
       if (!line.trim()) continue;
@@ -28,6 +32,20 @@ class TeamConfigFilter extends Transform {
       }
     }
 
+    callback(); 
+  }
+
+  _flush(callback) {
+    if (this._lineBuf.trim()) {
+      this.total++;
+      try {
+        const config = JSON.parse(this._lineBuf);
+        if (this.predicate(config)) {
+          this.kept++;
+          this.push(this._lineBuf + '\n');
+        }
+      } catch { /* skip */ }
+    }
     callback();
   }
 }
